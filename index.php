@@ -1,3 +1,4 @@
+<!-- ETUSIVU -->
 <?php 
   session_start(); 
 
@@ -35,12 +36,16 @@
       </div>
   	<?php endif ?>
 
-    <!-- KÄYTTÄJÄN KIRJAUTUMISSIVU -->
+    <!-- KIRJAUTUNEEN KÄYTTÄJÄN TIEDOT -->
     <?php  if (isset($_SESSION['username'])) : ?>
-    	<p>Tervetuloa <strong><?php echo $_SESSION['username']; ?></strong></p>
+    	<p>Tervetuloa <strong><?php echo $_SESSION['username']; ?></strong>!</p>
+        <p>Omat tiedot: <?php echo $_SESSION['firstname']; ?>
+                        <?php echo $_SESSION['lastname']; ?>
+        </p>
+		<p>Pääset päivittämään omat tietosi <a href="update.php">tästä</a>!
     	<p> <a href="index.php?logout='1'" style="color: red;">Kirjaudu ulos</a> </p>
     <?php endif ?>
 </div>
-	
+
 </body>
 </html>

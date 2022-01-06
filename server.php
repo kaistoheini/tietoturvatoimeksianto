@@ -1,19 +1,20 @@
 <?php
+
 session_start();
 
-// MUUTTUJAT:
+// MUUTTUJIEN ALUSTAMINEN:
 $username = "";
-$password  = "";
+$password = "";
 $firstname = "";
 $lastname = "";
 $errors = array(); 
 
 // MUODOSTETAAN TIETOKANTAYHTEYS:
-$dbcon = mysqli_connect('localhost', 'juuri', '', 'v0kahe03');
+$dbcon = mysqli_connect('localhost', 'root', '', 'v0kahe03');
 
 // REKISTERÖIDÄÄN KÄYTTÄJÄ:
 if (isset($_POST['reg_user'])) {
-
+  // Input-arvot lomakkeelta:
   $username = mysqli_real_escape_string($dbcon, $_POST['username']);
   $firstname = mysqli_real_escape_string($dbcon, $_POST['firstname']);
   $lastname = mysqli_real_escape_string($dbcon, $_POST['lastname']);
@@ -30,7 +31,7 @@ if (isset($_POST['reg_user'])) {
   $result = mysqli_query($dbcon, $user_check_query);
   $user = mysqli_fetch_assoc($result);
   
-   // JOS KÄYTTÄJÄNIMI ON VARATTU:
+   // ILMOITUS, JOS KÄYTTÄJÄNIMI ON VARATTU:
     if ($user['username'] === $username) {
       array_push($errors, "Käyttäjänimi on varattu.");
     }
@@ -38,7 +39,6 @@ if (isset($_POST['reg_user'])) {
   // REKISTERÖIDÄÄN KÄYTTÄJÄ, JOS LOMAKKEELLA EI OLE VIRHEITÄ:
   if (count($errors) == 0) {
     $password = md5($password); // Salataan salasana
-
 
     $query = $dbcon->prepare("INSERT INTO user (username, password) VALUES (?,?)");
     $query->bind_param("ss", $username, $password); // Bindataan parametrit
@@ -48,7 +48,7 @@ if (isset($_POST['reg_user'])) {
     $query2->bind_param("sss", $username, $firstname, $lastname);
     $query2->execute();
 
-    $_SESSION['username'] = $username;
+    $_SESSION['username'] = $_POST["username"];
     $_SESSION['firstname'] = $firstname;
     $_SESSION['lastname'] = $lastname;
     $_SESSION['success'] = "Olet kirjautunut sisään!";
@@ -58,9 +58,15 @@ if (isset($_POST['reg_user'])) {
 
   // KÄYTTÄJÄN KIRJAUTUMINEN:
 if (isset($_POST['login_user'])) {
+    $_SESSION['username'] = $username;
+    $_SESSION['firstname'] = $firstname;
+    $_SESSION['lastname'] = $lastname;
+    $_SESSION['password'] = $password;
+
     $username = mysqli_real_escape_string($dbcon, $_POST['username']);
     $password = mysqli_real_escape_string($dbcon, $_POST['password']);
   
+    // ILMOITUKSET, JOS KÄYTTÄJÄNIMEÄ/SALASANAA EI OLE SYÖTETTY:
     if (empty($username)) {
         array_push($errors, "Käyttäjänimi vaaditaan!");
     }
@@ -70,10 +76,17 @@ if (isset($_POST['login_user'])) {
   
     if (count($errors) == 0) {
         $password = md5($password);
+
         $query = "SELECT * FROM user WHERE username='$username' AND password='$password'";
         $results = mysqli_query($dbcon, $query);
+
         if (mysqli_num_rows($results) == 1) {
-          $_SESSION['username'] = $username;
+          $query2 = "SELECT * FROM info WHERE username='$username'";
+          $results = mysqli_query($dbcon, $query2);
+
+          $_SESSION['username'] = $_POST["username"];
+          $_SESSION['firstname'] = $firstname;
+          $_SESSION['lastname'] = $lastname;
           $_SESSION['success'] = "Olet nyt kirjautunut sisään!";
           header('location: index.php');
         }else {
@@ -81,3 +94,23 @@ if (isset($_POST['login_user'])) {
         }
     }
 }
+    if (isset($_POST['update_user'])) {
+        $username = $_SESSION['username'];
+        $firstname = $_POST['firstname'];
+        $lastname = $_POST['lastname'];
+    
+        // PÄIVITETÄÄN KÄYTTÄJÄN TIEDOT:
+        if (count($errors) == 0) { 
+            $password = md5($password); 
+    
+            $query = "UPDATE info SET firstname='$firstname', lastname='$lastname' WHERE username='$username'";
+            $result = mysqli_query($dbcon, $query);
+    
+            $_SESSION['username'] = $username;
+            $_SESSION['firstname'] = $firstname;
+            $_SESSION['lastname'] = $lastname;
+            $_SESSION['success'] = "Tietosi on päivitetty!";
+            header('location: index.php');
+        }
+    }
+?>

@@ -1,8 +1,9 @@
+<!-- KIRJAUTUMISSIVU -->
 <?php include('server.php') ?>
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Registration system PHP and MySQL</title>
+  <title>Kirjautuminen</title>
   <link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
@@ -24,7 +25,7 @@
   		<button type="submit" class="btn" name="login_user">Kirjaudu</button>
   	</div>
   	<p>
-  		Etkö ole vielä jäsen?<a href="register.php">Rekisteröidy!</a>
+  		Etkö ole vielä jäsen? <a href="register.php">Rekisteröidy tästä!</a>
   	</p>
   </form>
 </body>
